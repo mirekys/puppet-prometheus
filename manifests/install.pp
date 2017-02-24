@@ -19,6 +19,26 @@ class prometheus::install {
         docker_service  => true,
       }
     }
+    'repo' : {
+        case $::osfamily {
+            'RedHat' : {
+                yumrepo { 'prometheus-rpm_release':
+                    baseurl => "https://packagecloud.io/prometheus-rpm/release/el/${::operatingsystemmajrelease}/$basearch",
+                    repo_gpgcheck   => 1,
+                    gpgcheck        => 0,
+                    enabled         => 1,
+                    gpgkey          => 'https://packagecloud.io/prometheus-rpm/release/gpgkey',
+                    sslverify       => 1,
+                    sslcacert       => '/etc/pki/tls/certs/ca-bundle.crt',
+                    metadata_expire => 300,
+                }
+            }
+            default : {
+                fail("Repo installation method is not supported on: ${::osfamily}")
+            }
+        }
+        package { $::prometheus::package_name: ensure => $::prometheus::package_ensure, }
+    }
     default     : {
       package { $::prometheus::package_name: ensure => $::prometheus::package_ensure, }
     }
