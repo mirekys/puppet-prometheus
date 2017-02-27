@@ -19,9 +19,7 @@ class prometheus::install {
         docker_service  => true,
       }
     }
-    'repo' : {
-    }
-    default     : {
+    default : {
       case $::osfamily {
         'RedHat' : {
           yumrepo { 'prometheus-rpm_release':
@@ -37,7 +35,7 @@ class prometheus::install {
           $requiredrepo = Yumrepo['prometheus-rpm_release']
         }
         default : {
-          fail("Repo installation method is not supported on: ${::osfamily}")
+	  $requiredrepo = []
         }
       }
       package { $::prometheus::package_name:
